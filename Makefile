@@ -14,7 +14,7 @@ SDK.IAP.TOOLCHAINFILE=$(SDK.IAP.DIR)/armgcc.cmake
 TOOLCHAIN.NAME=gcc-arm-none-eabi-7-2017-q4-major
 TOOLCHAIN.ARCHIVE.LINUX=$(DOWNLOADS.DIR)/$(TOOLCHAIN.NAME)-linux.tar.bz2
 TOOLCHAIN.ARCHIVE.OSX=$(DOWNLOADS.DIR)/$(TOOLCHAIN.NAME)-mac.tar.bz2
-TOOLCHAIN.DIR=$(BASE.DIR)/$(TOOLCHAIN.NAME)
+TOOLCHAIN.DIR=$(DOWNLOADS.DIR)/$(TOOLCHAIN.NAME)
 TOOLCHAIN.URL.LINUX=https://s3.amazonaws.com/buildroot-sources/$(TOOLCHAIN.NAME)-linux.tar.bz2
 TOOLCHAIN.URL.OSX=https://s3.amazonaws.com/buildroot-sources/$(TOOLCHAIN.NAME)-mac.tar.bz2
 CMAKE.URL=https://s3.amazonaws.com/buildroot-sources/cmake-3.10.2.tar.gz
@@ -60,7 +60,7 @@ FIRMWARE.DIR=$(BASE.DIR)/firmware
 FIRMWARE.SLOT1.BUILD=$(BASE.DIR)/build.firmware-slot1
 FIRMWARE.SLOT2.BUILD=$(BASE.DIR)/build.firmware-slot2
 
-bootstrap: toolchain cmake jlink.fetch
+bootstrap: toolchain cmake jlink.fetch sdk
 
 ctags: .FORCE
 	cd $(BASE.DIR) && ctags -R --exclude=.git --exclude=installed.host --exclude=installed.target --exclude=downloads  --exclude=build.* --exclude=$(TOOLCHAIN.NAME) .
@@ -104,12 +104,12 @@ endif
 toolchain: .FORCE
 ifeq ($(OS), Linux)
 	mkdir -p $(DOWNLOADS.DIR) && cd $(DOWNLOADS.DIR) && wget -q $(TOOLCHAIN.URL.LINUX)
-	tar xf $(TOOLCHAIN.ARCHIVE.LINUX)
+	cd $(DOWNLOADS.DIR) && tar xf $(TOOLCHAIN.ARCHIVE.LINUX)
 endif
 
 ifeq ($(OS), Darwin)
 	mkdir -p $(DOWNLOADS.DIR) && cd $(DOWNLOADS.DIR) && wget -q $(TOOLCHAIN.URL.OSX)
-	tar xf $(TOOLCHAIN.ARCHIVE.OSX)
+	cd $(DOWNLOADS.DIR) && tar xf $(TOOLCHAIN.ARCHIVE.OSX)
 endif
 toolchain.clean: .FORCE
 	rm -rf $(TOOLCHAIN.ARCHIVE.LINUX)
@@ -153,7 +153,7 @@ firmware.slot2.clean: .FORCE
 	rm -rf $(FIRMWARE.SLOT2.BUILD)
 
 
-clean: toolchain.clean firmware.slot1.clean firmware.slot2.clean cmake.clean 
+clean: toolchain.clean firmware.clean cmake.clean 
 	rm -rf $(INSTALLED.HOST.DIR)
 	rm -rf $(INSTALLED.TARGET.DIR)
 	rm -rf $(DOWNLOADS.DIR)
