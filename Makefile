@@ -36,23 +36,8 @@ JLINK.OSX.URL=https://s3.amazonaws.com/ckelso-toolchain/$(JLINK.OSX.ARCHIVE)
 JLINK.OSX.DIR=$(DOWNLOADS.DIR)/JLink.pkg/Applications/SEGGER/JLink_V634c
 JLINK.OSX.FLASH.BIN=$(JLINK.OSX.DIR)/JLinkExe
 JLINK.OSX.GDB.BIN=$(JLINK.OSX.DIR)/JLinkGDBServer
-FIRMWARE.SLOT1.RELEASE.BIN=$(FIRMWARE.SLOT1.BUILD)/Release/firmware-slot1.bin
-FIRMWARE.SLOT1.DEBUG.BIN=$(FIRMWARE.SLOT1.BUILD)/Debug/firmware-slot1.bin
-FIRMWARE.SLOT1.DEBUG.SREC=$(FIRMWARE.SLOT1.BUILD)/Debug/firmware-slot1.srec
-FIRMWARE.SLOT1.DEBUG.SREC.FILLED=$(FIRMWARE.SLOT1.BUILD)/Debug/firmware-slot1.srec.filled
-FIRMWARE.SLOT1.RELEASE.ELF=$(FIRMWARE.SLOT1.BUILD)/Release/firmware-slot1.elf
-FIRMWARE.SLOT1.DEBUG.ELF=$(FIRMWARE.SLOT1.BUILD)/Debug/firmware-slot1.elf
-FIRMWARE.SLOT2.RELEASE.BIN=$(FIRMWARE.SLOT2.BUILD)/Release/firmware-slot2.bin
-FIRMWARE.SLOT2.DEBUG.BIN=$(FIRMWARE.SLOT2.BUILD)/Debug/firmware-slot2.bin
-FIRMWARE.SLOT2.DEBUG.SREC=$(FIRMWARE.SLOT2.BUILD)/Debug/firmware-slot2.srec
-FIRMWARE.SLOT2.DEBUG.SREC.FILLED=$(FIRMWARE.SLOT2.BUILD)/Debug/firmware-slot2.srec.filled
-FIRMWARE.SLOT2.RELEASE.ELF=$(FIRMWARE.SLOT2.BUILD)/Release/firmware-slot2.elf
-FIRMWARE.SLOT2.DEBUG.ELF=$(FIRMWARE.SLOT2.BUILD)/Debug/firmware-slot2.elf
-FIRMWARE.SLOT1.UPDATE=$(BASE.DIR)/update_slot1.sh
-FIRMWARE.SLOT2.UPDATE=$(BASE.DIR)/update_slot2.sh
-FIRMWARE.DIR=$(BASE.DIR)/firmware
-FIRMWARE.SLOT1.BUILD=$(BASE.DIR)/build.firmware-slot1
-FIRMWARE.SLOT2.BUILD=$(BASE.DIR)/build.firmware-slot2
+FIRMWARE.DIR=$(BASE.DIR)/source
+FIRMWARE.BUILD=$(BASE.DIR)/build.firmware
 
 bootstrap: toolchain cmake jlink.fetch sdk
 
@@ -140,12 +125,16 @@ cmake: cmake.fetch
 cmake.clean: .FORCE
 	rm -rf $(CMAKE.DIR)
 
-firmware: firmware.clean firmware.build
+firmware.build: .FORCE
+	mkdir -p $(FIRMWARE.BUILD)
+	cd $(FIRMWARE.BUILD) && export ARMGCC_DIR=$(TOOLCHAIN.DIR) && $(CMAKE.BIN) -DCMAKE_BUILD_TYPE=debug -DSDK_DIR=$(SDK.IAP.DIR) -DCMAKE_TOOLCHAIN_FILE=$(SDK.IAP.TOOLCHAINFILE) $(FIRMWARE.DIR) && make -j$(J) 
 
 firmware.clean: .FORCE
-	rm -rf $(SDK.IAP.BUILD)
+	rm -rf $(FIRMWARE.BUILD)
 
-firmware.build: .FORCE
+firmware: firmware.clean firmware.build
+
+firmware.stock: .FORCE
 	cd $(SDK.IAP.DIR) && export ARMGCC_DIR=$(TOOLCHAIN.DIR) && ./build_debug.sh
 	cd $(SDK.IAP.DIR)/debug && $(TOOLCHAIN.DIR)/bin/arm-none-eabi-objcopy -O binary iap_flash.elf iap_flash.bin
 
