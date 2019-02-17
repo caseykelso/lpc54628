@@ -13,6 +13,28 @@ make firmware
 make flash
 ```
 
+## Serial Debug Output
+* Setup udev rules for the dev kit
+* Open minicom on /dev/ttyUSB0
+* Set flow control to off
+
+## Expected serial debug output for the stock iap flash project
+```bash
+IAP Flash example
+
+Writing flash sector 1
+
+Erasing flash sector 1
+
+Erasing page 1 in flash sector 1
+
+Flash signature value of page 1
+
+FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+
+End of IAP Flash Example
+```
+
 ## Debug it
 
 Open terminal 1

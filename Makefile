@@ -23,20 +23,14 @@ CMAKE.ARCHIVE=$(DOWNLOADS.DIR)/cmake-3.10.2.tar.gz
 CMAKE.BIN=$(INSTALLED.HOST.DIR)/bin/cmake
 JLINK.ARCHIVE=JLink_Linux_V634h_x86_64.tgz
 JLINK.URL=https://s3.amazonaws.com/ckelso-toolchain/$(JLINK.ARCHIVE)
-#JLINK.URL=https://www.segger.com/downloads/jlink/JLink_Linux_V634h_x86_64.tgz
 JLINK.DIR=$(DOWNLOADS.DIR)/JLink_Linux_V634h_x86_64
 JLINK.FLASH.BIN=$(JLINK.DIR)/JLinkExe
 JLINK.GDB.BIN=$(JLINK.DIR)/JLinkGDBServer
-JLINK.SHA.FLASH.SCRIPT.DEBUG=$(BASE.DIR)/flash.sha.jlink.debug
-JLINK.FLASH.SLOT1.SCRIPT.DEBUG=$(BASE.DIR)/flash.slot1.jlink.debug
-JLINK.FLASH.SLOT2.SCRIPT.DEBUG=$(BASE.DIR)/flash.slot2.jlink.debug
-JLINK.FLASH.SCRIPT.RELEASE=$(BASE.DIR)/flash.jlink.release
-JLINK.FLASH.BL.SCRIPT=$(BASE.DIR)/flash.bl.jlink
 JLINK.FLASH.DOWNLOAD.SCRIPT=$(BASE.DIR)/flash.download
 JLINK.RESET.SCRIPT=$(BASE.DIR)/reset.jlink
 JLINK.ERASE.SCRIPT=$(BASE.DIR)/erase.jlink
+JLINK.FLASH.SCRIPT=$(BASE.DIR)/flash.jlink
 JLINK.DOWNLOAD.SCRIPT=$(BASE.DIR)/download.jlink
-JLINK.UPLOAD.SCRIPT=$(BASE.DIR)/upload.jlink
 JLINK.OSX.ARCHIVE=JLink_MacOSX_V634c.pkg
 JLINK.OSX.URL=https://s3.amazonaws.com/ckelso-toolchain/$(JLINK.OSX.ARCHIVE)
 JLINK.OSX.DIR=$(DOWNLOADS.DIR)/JLink.pkg/Applications/SEGGER/JLink_V634c
@@ -92,6 +86,15 @@ ifeq ($(OS), Darwin)
 	$(JLINK.OSX.GDB.BIN) -device LPC54628J512 -if SWD -speed 4000 -autoconnect 1
 endif
 
+erase: .FORCE
+ifeq ($(OS), Linux)
+	$(JLINK.FLASH.BIN) -device LPC54628J512 -if SWD -speed 4000 -autoconnect 1 -CommanderScript $(JLINK.ERASE.SCRIPT)
+endif
+
+ifeq ($(OS), Darwin)
+	$(JLINK.OSX.FLASH.BIN) -device LPC54628J512 -if SWD -speed 4000 -autoconnect 1 -CommanderScript $(JLINK.ERASE.SCRIPT)
+endif
+
 reset: .FORCE
 ifeq ($(OS), Linux)
 	$(JLINK.FLASH.BIN) -device LPC54628J512 -if SWD -speed 4000 -autoconnect 1 -CommanderScript $(JLINK.RESET.SCRIPT)
@@ -100,6 +103,17 @@ endif
 ifeq ($(OS), Darwin)
 	$(JLINK.OSX.FLASH.BIN) -device LPC54628J512 -if SWD -speed 4000 -autoconnect 1 -CommanderScript $(JLINK.RESET.SCRIPT)
 endif
+
+flash: .FORCE
+ifeq ($(OS), Linux)
+	$(JLINK.FLASH.BIN) -device LPC54628J512 -if SWD -speed 4000 -autoconnect 1 -CommanderScript $(JLINK.FLASH.SCRIPT)
+endif
+
+ifeq ($(OS), Darwin)
+	$(JLINK.OSX.FLASH.BIN) -device LPC54628J512 -if SWD -speed 4000 -autoconnect 1 -CommanderScript $(JLINK.FLASH.SCRIPT)
+endif
+
+
 
 toolchain: .FORCE
 ifeq ($(OS), Linux)
@@ -132,8 +146,8 @@ firmware.clean: .FORCE
 	rm -rf $(SDK.IAP.BUILD)
 
 firmware.build: .FORCE
-	mkdir -p $(SDK.IAP.BUILD)
-	cd $(SDK.IAP.BUILD) && $(CMAKE.BIN) -DCMAKE_TOOLCHAIN_FILE=$(SDK.IAP.TOOLCHAINFILE) -G "Unix Makefiles" -DCMAKE_BUILD_TYPE=debug $(SDK.IAP.DIR)
+	cd $(SDK.IAP.DIR) && export ARMGCC_DIR=$(TOOLCHAIN.DIR) && ./build_debug.sh
+	cd $(SDK.IAP.DIR)/debug && $(TOOLCHAIN.DIR)/bin/arm-none-eabi-objcopy -O binary iap_flash.elf iap_flash.bin
 
 sdk: sdk.clean sdk.fetch
 

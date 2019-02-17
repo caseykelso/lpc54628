@@ -1,0 +1,3 @@
+loadbin downloads/iap_flash/debug/iap_flash.bin 0x0
+r
+q
