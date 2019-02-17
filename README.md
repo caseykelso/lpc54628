@@ -12,7 +12,7 @@ sudo apt-get remove modemmanager
 sudo usermod -a -G dialout $USER
 ```
 
-## Linux Dev Rules
+## udev rules
 ```bash
 SUBSYSTEM=="usb", ATTR{idVendor}=="1366", MODE="0664", GROUP="plugdev"
 SUBSYSTEM=="usb", ATTR{idVendor}=="0403", MODE="0664", GROUP="dialout"
