@@ -1,0 +1,4 @@
+savebin flash.bin, 0x0, 0x7FFFF
+r
+q
+
