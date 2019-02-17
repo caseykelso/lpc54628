@@ -27,10 +27,10 @@ __Vectors:
     .long   MemManage_Handler                               /* MPU Fault Handler */
     .long   BusFault_Handler                                /* Bus Fault Handler */
     .long   UsageFault_Handler                              /* Usage Fault Handler */
-    .long   0                                               /* Reserved */
+    .long   0xDFE561E2                                      /* Checksum of 1st 7 words */
     .long   0xFFFFFFFF                                      /* ECRP */
-    .long   0                                               /* Reserved */
-    .long   0                                               /* Reserved */
+    .long   0x0FFEB6B6                                      /* Bootmode dual image */
+    .long   imageHeader
     .long   SVC_Handler                                     /* SVCall Handler */
     .long   DebugMon_Handler                                /* Debug Monitor Handler */
     .long   0

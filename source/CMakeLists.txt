@@ -20,6 +20,7 @@ SET(CMAKE_EXECUTABLE_LIBRARY_SUFFIX)
  
 # CURRENT DIRECTORY
 SET(ProjDirPath ${SDK_DIR})
+SET(dualimageproject ${CMAKE_CURRENT_SOURCE_DIR})
 
 
 SET(CMAKE_ASM_FLAGS_DEBUG "${CMAKE_ASM_FLAGS_DEBUG} -DDEBUG")
@@ -320,7 +321,7 @@ SET(CMAKE_EXE_LINKER_FLAGS_RELEASE "${CMAKE_EXE_LINKER_FLAGS_RELEASE} -mfpu=fpv4
 
 #include_directories(${ProjDirPath}/..)
 include_directories(${ProjDirPath}/source)
-include_directories(${ProjDirPath}/startup)
+include_directories(${dualimageproject}/startup)
 include_directories(${ProjDirPath}/component/uart)
 include_directories(${ProjDirPath}/component/lists)
 include_directories(${ProjDirPath}/utilities)
@@ -409,9 +410,9 @@ add_executable(iap_flash.elf
 "${ProjDirPath}/drivers/fsl_usart.c"
 "${ProjDirPath}/drivers/fsl_usart.h"
 "${ProjDirPath}/libs/libpower_hardabi.a"
-"${ProjDirPath}/source/iap_flash.c"
-"${ProjDirPath}/src/LPC54628J512_flash.ld"
-"${ProjDirPath}/startup/startup_LPC54628.S"
+"${dualimageproject}/iap_flash.c"
+"${dualimageproject}/LPC54628J512_flash.ld"
+"${dualimageproject}/startup/startup_LPC54628.S"
 "${ProjDirPath}/utilities/fsl_assert.c"
 "${ProjDirPath}/utilities/fsl_debug_console.c"
 "${ProjDirPath}/utilities/fsl_debug_console.h"
