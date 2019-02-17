@@ -15,6 +15,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "imageheader.h"
+#define MYSECTOR  0
 
 /*******************************************************************************
  * Definitions
@@ -43,6 +44,8 @@ int main(void)
     uint32_t i;
     uint32_t status;
     uint32_t flashSignature[4];
+    char outputbuffer[100];
+    enum _iap_status iap_result = kStatus_IAP_DstAddrError;
 
     /* Board pin, clock, debug console init */
     /* attach 12 MHz clock to FLEXCOMM0 (debug console) */
@@ -53,10 +56,11 @@ int main(void)
     BOARD_InitDebugConsole();
 
     PRINTF("\f\r\nIAP Flash example\r\n");
-    PRINTF("\r\nWriting flash sector 1\r\n");
+    sprintf(outputbuffer,"\r\nWriting flash sector %d\r\n",SECTOR_START);
+    printf(outputbuffer);
     /* Erase sector before writing */
-    IAP_PrepareSectorForWrite(1, 1);
-    IAP_EraseSector(1, 1, SystemCoreClock);
+    IAP_PrepareSectorForWrite(SECTOR_START, SECTOR_END);
+    IAP_EraseSector(SECTOR_START, SECTOR_END, SystemCoreClock);
     /* Generate data to be written to flash */
     for (i = 0; i < FSL_FEATURE_SYSCON_FLASH_PAGE_SIZE_BYTES; i++)
     {
@@ -65,9 +69,14 @@ int main(void)
     /* Program sector */
     for (i = 0; i < (FSL_FEATURE_SYSCON_FLASH_SECTOR_SIZE_BYTES / FSL_FEATURE_SYSCON_FLASH_PAGE_SIZE_BYTES); i++)
     {
-        IAP_PrepareSectorForWrite(1, 1);
-        IAP_CopyRamToFlash(FSL_FEATURE_SYSCON_FLASH_SECTOR_SIZE_BYTES + (i * FSL_FEATURE_SYSCON_FLASH_PAGE_SIZE_BYTES),
+        iap_result = IAP_PrepareSectorForWrite(SECTOR_START, SECTOR_END);
+	sprintf(outputbuffer,"\r\nPreparing flash sector %d results is %d\r\n",MYSECTOR, iap_result);
+	printf(outputbuffer);
+        iap_result = IAP_CopyRamToFlash((FSL_FEATURE_SYSCON_FLASH_SECTOR_SIZE_BYTES*MYSECTOR) + (i * FSL_FEATURE_SYSCON_FLASH_PAGE_SIZE_BYTES),
                            &s_PageBuf[0], FSL_FEATURE_SYSCON_FLASH_PAGE_SIZE_BYTES, SystemCoreClock);
+	sprintf(outputbuffer,"\r\nWriting flash sector %d results is %d\r\n",SECTOR_START, iap_result);
+	printf(outputbuffer);
+        
     }
     /* Verify sector contents */
     for (i = 0; i < (FSL_FEATURE_SYSCON_FLASH_SECTOR_SIZE_BYTES / FSL_FEATURE_SYSCON_FLASH_PAGE_SIZE_BYTES); i++)
@@ -83,22 +92,24 @@ int main(void)
         }
     }
 
-    PRINTF("\r\nErasing flash sector 1\r\n");
-    IAP_PrepareSectorForWrite(1, 1);
-    IAP_EraseSector(1, 1, SystemCoreClock);
-    status = IAP_BlankCheckSector(1, 1);
+    sprintf(outputbuffer,"\r\nErasing flash sector %d\r\n",SECTOR_START);
+    PRINTF(outputbuffer);
+    IAP_PrepareSectorForWrite(SECTOR_START, SECTOR_END);
+    IAP_EraseSector(SECTOR_START, SECTOR_END, SystemCoreClock);
+    status = IAP_BlankCheckSector(SECTOR_START, SECTOR_END);
     if (status != kStatus_IAP_Success)
     {
         PRINTF("\r\nSector erase failed\r\n");
     }
 
-    PRINTF("\r\nErasing page 1 in flash sector 1\r\n");
+    sprintf(outputbuffer,"\r\nErasing page 1 in flash sector %d\r\n",SECTOR_START);
+    printf(outputbuffer);
     /* First write a page */
-    IAP_PrepareSectorForWrite(1, 1);
+    IAP_PrepareSectorForWrite(SECTOR_START, SECTOR_END);
     IAP_CopyRamToFlash(FSL_FEATURE_SYSCON_FLASH_SECTOR_SIZE_BYTES, &s_PageBuf[0],
                        FSL_FEATURE_SYSCON_FLASH_PAGE_SIZE_BYTES, SystemCoreClock);
     /* Erase page */
-    IAP_PrepareSectorForWrite(1, 1);
+    IAP_PrepareSectorForWrite(SECTOR_START, SECTOR_END);
     IAP_ErasePage(FSL_FEATURE_SYSCON_FLASH_SECTOR_SIZE_BYTES / FSL_FEATURE_SYSCON_FLASH_PAGE_SIZE_BYTES,
                   FSL_FEATURE_SYSCON_FLASH_SECTOR_SIZE_BYTES / FSL_FEATURE_SYSCON_FLASH_PAGE_SIZE_BYTES,
                   SystemCoreClock);
