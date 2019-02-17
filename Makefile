@@ -166,6 +166,8 @@ clean: toolchain.clean firmware.clean cmake.clean
 	rm -rf $(INSTALLED.TARGET.DIR)
 	rm -rf $(DOWNLOADS.DIR)
 
+g: firmware flash.dual
+
 .FORCE:
 
 
