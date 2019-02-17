@@ -1,0 +1,3 @@
+loadbin build.firmware/debug/iap_flash.bin 0x40000
+r
+q

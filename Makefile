@@ -27,6 +27,7 @@ JLINK.DIR=$(DOWNLOADS.DIR)/JLink_Linux_V634h_x86_64
 JLINK.FLASH.BIN=$(JLINK.DIR)/JLinkExe
 JLINK.GDB.BIN=$(JLINK.DIR)/JLinkGDBServer
 JLINK.FLASH.DOWNLOAD.SCRIPT=$(BASE.DIR)/flash.download
+JLINK.FLASH.DUAL.SCRIPT=$(BASE.DIR)/flash-dual.jlink
 JLINK.RESET.SCRIPT=$(BASE.DIR)/reset.jlink
 JLINK.ERASE.SCRIPT=$(BASE.DIR)/erase.jlink
 JLINK.FLASH.SCRIPT=$(BASE.DIR)/flash.jlink
@@ -55,7 +56,7 @@ endif
 
 flash.download: .FORCE
 ifeq ($(OS), Linux)
-	$(JLINK.FLASH.BIN) -device LPC54628J512 -if SWD -speed 4000 -autoconnect 1 -CommanderScript $(JLINK.FLASH.DOWNLOAD.SCRIPT)
+	$(JLINK.FLASH.BIN) -device LPC54628J512 -if SWD -speed 4000 -autoconnect 1 -CommanderScript $(JLINK.DOWNLOAD.SCRIPT)
 endif
 
 ifeq ($(OS), Darwin)
@@ -98,6 +99,15 @@ ifeq ($(OS), Darwin)
 	$(JLINK.OSX.FLASH.BIN) -device LPC54628J512 -if SWD -speed 4000 -autoconnect 1 -CommanderScript $(JLINK.FLASH.SCRIPT)
 endif
 
+flash.dual: .FORCE
+ifeq ($(OS), Linux)
+	$(JLINK.FLASH.BIN) -device LPC54628J512 -if SWD -speed 4000 -autoconnect 1 -CommanderScript $(JLINK.FLASH.DUAL.SCRIPT)
+endif
+
+ifeq ($(OS), Darwin)
+	$(JLINK.OSX.FLASH.BIN) -device LPC54628J512 -if SWD -speed 4000 -autoconnect 1 -CommanderScript $(JLINK.FLASH.DUAL.SCRIPT)
+endif
+
 
 
 toolchain: .FORCE
@@ -128,6 +138,8 @@ cmake.clean: .FORCE
 firmware.build: .FORCE
 	mkdir -p $(FIRMWARE.BUILD)
 	cd $(FIRMWARE.BUILD) && export ARMGCC_DIR=$(TOOLCHAIN.DIR) && $(CMAKE.BIN) -DCMAKE_BUILD_TYPE=debug -DSDK_DIR=$(SDK.IAP.DIR) -DCMAKE_TOOLCHAIN_FILE=$(SDK.IAP.TOOLCHAINFILE) $(FIRMWARE.DIR) && make -j$(J) 
+	cd $(FIRMWARE.BUILD)/debug && $(TOOLCHAIN.DIR)/bin/arm-none-eabi-objcopy -O binary iap_flash.elf iap_flash.bin
+
 
 firmware.clean: .FORCE
 	rm -rf $(FIRMWARE.BUILD)
