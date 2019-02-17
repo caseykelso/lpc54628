@@ -422,9 +422,9 @@ add_executable(iap_flash.elf
 )
 
 
-set(CMAKE_EXE_LINKER_FLAGS_DEBUG "${CMAKE_EXE_LINKER_FLAGS_DEBUG} -T${ProjDirPath}/LPC54628J512_flash.ld -static")
+set(CMAKE_EXE_LINKER_FLAGS_DEBUG "${CMAKE_EXE_LINKER_FLAGS_DEBUG} -T${dualimageproject}/LPC54628J512_flash.ld -static")
 
-set(CMAKE_EXE_LINKER_FLAGS_RELEASE "${CMAKE_EXE_LINKER_FLAGS_RELEASE} -T${ProjDirPath}/LPC54628J512_flash.ld -static")
+set(CMAKE_EXE_LINKER_FLAGS_RELEASE "${CMAKE_EXE_LINKER_FLAGS_RELEASE} -T${dualimageproject}/LPC54628J512_flash.ld -static")
 
 TARGET_LINK_LIBRARIES(iap_flash.elf -Wl,--start-group)
 target_link_libraries(iap_flash.elf debug ${ProjDirPath}/libs/libpower_hardabi.a)

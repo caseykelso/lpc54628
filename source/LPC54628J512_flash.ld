@@ -31,7 +31,7 @@ STACK_SIZE = DEFINED(__stack_size__) ? __stack_size__ : 0x0800;
 MEMORY
 {
   m_interrupts          (RX)  : ORIGIN = 0x00040000, LENGTH = 0x00000400
-  m_text                (RX)  : ORIGIN = 0x00000400, LENGTH = 0x0007FC00
+  m_text                (RX)  : ORIGIN = 0x00040400, LENGTH = 0x0007FC00
   m_data                (RW)  : ORIGIN = 0x20000000, LENGTH = 0x00028000
   m_sramx               (RW)  : ORIGIN = 0x04000000, LENGTH = 0x00008000
   m_usb_sram            (RW)  : ORIGIN = 0x40100000, LENGTH = 0x00002000

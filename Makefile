@@ -161,13 +161,6 @@ sdk.fetch: .FORCE
 	cd $(DOWNLOADS.DIR) && wget $(SDK.IAP.URL) && unzip $(SDK.IAP.ARCHIVE)
 	cd $(SDK.IAP.DIR) && chmod +x ./build*.sh
 
-firmware.slot1.clean: .FORCE
-	rm -rf $(FIRMWARE.SLOT1.BUILD)
-
-firmware.slot2.clean: .FORCE
-	rm -rf $(FIRMWARE.SLOT2.BUILD)
-
-
 clean: toolchain.clean firmware.clean cmake.clean 
 	rm -rf $(INSTALLED.HOST.DIR)
 	rm -rf $(INSTALLED.TARGET.DIR)
