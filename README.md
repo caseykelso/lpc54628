@@ -1,9 +1,9 @@
-# lpc54628 - hello world
+# lpc54628 IAP Test Project using the Dual Enhanced Images Feature
+* This project demonstrates that booting from a dual enhanced image at 0x40000 and attempting to flash a 2nd dual enhanced image at 0x0 fails with iap status 0x15 which is undocumented.
 
 ## Background
 * Tested on an OM13094 LPCXpresso54618 dev kit
 * A JLINK device is connected to the dev kit's SWD connector
-*
 
 ## Ubuntu 18.04 Environment Prerequisites
 ```bash
